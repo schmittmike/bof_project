@@ -22,11 +22,11 @@ int add_new_employee(struct Employee *database, int employee_count) {
 	printf("enter employee name: ");
 	gets(name_input);
 	printf("welcome to work, %s! :3\n", name_input);
-	
+
 	database[employee_count].id = employee_count+1;
 	strcpy(database[employee_count].name, name_input);
 
-	return 0;	
+	return 0;
 }
 
 int main(void) {
