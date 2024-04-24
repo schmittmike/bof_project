@@ -1,3 +1,7 @@
 *.swp
 *.swo
+*.o
 timecard
+.gdb_history
+peda-session-timecard.txt
+badfile

