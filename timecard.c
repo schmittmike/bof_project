@@ -110,7 +110,7 @@ int add_employee_hours(struct Employee *database) {
 		database[atoi(id_input)-1].name,
 		database[atoi(id_input)-1].hours_worked);
 
-	return 0;	
+	return 0;
 }
 
 int main(void) {
