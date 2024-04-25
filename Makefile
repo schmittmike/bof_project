@@ -1,5 +1,5 @@
 TARGET=timecard
-OBJS=timecard.o
+OBJS=timecard.o diagrams.o
 
 #compile as 32 bit binary with executable stack, and debug info for gdb
 CFLAGS= -g -m32 -z execstack -fno-stack-protector -Wno-implicit
@@ -12,4 +12,4 @@ $(TARGET): $(OBJS)
 	sudo chmod 4755 $(TARGET)
 
 clean:
-	rm *.o $(TARGET)
+	rm *.o

